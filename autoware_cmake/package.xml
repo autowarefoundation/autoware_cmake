@@ -6,6 +6,7 @@
   <description>CMake scripts for Autoware</description>
   <maintainer email="ryohsuke.mitsudome@tier4.jp">Ryohsuke Mitsudome</maintainer>
   <maintainer email="esteve.fernandez@tier4.jp">Esteve Fernandez</maintainer>
+  <maintainer email="yutaka.kondo@tier4.jp">Yutaka Kondo</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
