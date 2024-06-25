@@ -42,6 +42,8 @@ macro(autoware_package)
     add_compile_definitions(ROS_DISTRO_GALACTIC)
   elseif(${ROS_DISTRO} STREQUAL "humble")
     add_compile_definitions(ROS_DISTRO_HUMBLE)
+  elseif(${ROS_DISTRO} STREQUAL "jazzy")
+    add_compile_definitions(ROS_DISTRO_JAZZY)
   endif()
 
   # Find dependencies
