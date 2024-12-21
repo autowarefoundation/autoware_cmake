@@ -34,4 +34,3 @@
     - source: .github/workflows/build-and-test-differential.yaml
       pre-commands: |
         sed -i '/build-depends-repos/d' {source}
-
