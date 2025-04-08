@@ -2,8 +2,8 @@
 Changelog for package autoware_cmake
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.2 (2025-04-08)
+------------------
 * fix(autoware_package.cmake): workaround to avoid `missing tinyxml2::tinyxml2` (`#24 <https://github.com/autowarefoundation/autoware_cmake/issues/24>`_)
   * add tinyxml2 workaround
   * move
