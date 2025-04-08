@@ -46,20 +46,6 @@ macro(autoware_package)
 
   # Find dependencies
   find_package(ament_cmake_auto REQUIRED)
-  ament_auto_find_build_dependencies()
-
-  # Set common system includes
-  include_directories(SYSTEM
-    ${EIGEN3_INCLUDE_DIR}
-  )
-
-  # Workaround for lanelet2-core@1.2.1
-  if(TARGET lanelet2_core::lanelet2_core)
-    get_target_property(lanelet2_core_INCLUDE_DIRECTORIES lanelet2_core::lanelet2_core INTERFACE_INCLUDE_DIRECTORIES)
-    include_directories(SYSTEM
-      ${lanelet2_core_INCLUDE_DIRECTORIES}
-    )
-  endif()
 
   # TODO(youtalk): Remove this workaround once https://github.com/autowarefoundation/autoware_universe/issues/10410 is fixed
   find_package(TinyXML2 CONFIG QUIET)
@@ -75,6 +61,21 @@ macro(autoware_package)
       set_property(TARGET tinyxml2::tinyxml2 PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${TINYXML2_INCLUDE_DIR})
       list(APPEND TinyXML2_TARGETS tinyxml2::tinyxml2)
     endif()
+  endif()
+
+  ament_auto_find_build_dependencies()
+
+  # Set common system includes
+  include_directories(SYSTEM
+    ${EIGEN3_INCLUDE_DIR}
+  )
+
+  # Workaround for lanelet2-core@1.2.1
+  if(TARGET lanelet2_core::lanelet2_core)
+    get_target_property(lanelet2_core_INCLUDE_DIRECTORIES lanelet2_core::lanelet2_core INTERFACE_INCLUDE_DIRECTORIES)
+    include_directories(SYSTEM
+      ${lanelet2_core_INCLUDE_DIRECTORIES}
+    )
   endif()
 
   # Find test dependencies
