@@ -23,9 +23,38 @@ macro(autoware_package)
     add_compile_options(-Wall -Wextra -Wpedantic -Werror)
   endif()
 
-  # Ignore PCL errors in Clang
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    # Ignore PCL errors in Clang
     add_compile_options(-Wno-gnu-anonymous-struct -Wno-nested-anon-types)
+
+    # Flag unknown (e.g. GNU-specific) options, but do not fail compilation
+    add_compile_options(-Wno-error=unknown-warning-option)
+
+    # temporary
+    add_compile_options(
+      # Iteration 1
+      -Wno-error=delete-non-abstract-non-virtual-dtor
+      -Wno-error=delete-abstract-non-virtual-dtor
+      -Wno-error=deprecated-copy
+      -Wno-error=c11-extensions
+      -Wno-error=unused-but-set-variable
+      -Wno-error=unused-private-field
+      -Wno-error=infinite-recursion
+      -Wno-error=implicit-const-int-float-conversion
+      -Wno-error=unused-lambda-capture
+      -Wno-error=unused-const-variable
+      #Iteration 2
+      -Wno-error=deprecated-builtins
+      -Wno-error=format-security
+      -Wno-error=inconsistent-missing-override
+      -Wno-error=overloaded-virtual
+      -Wno-error=pessimizing-move
+      -Wno-error=sign-conversion
+      -Wno-error=unused-function
+      #Iteration 3
+      -Wno-error=defaulted-function-deleted
+      -Wno-error=unused-parameter
+    )
   endif()
 
   # Ignore Boost deprecated messages
