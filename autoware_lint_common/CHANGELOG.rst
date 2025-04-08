@@ -2,6 +2,9 @@
 Changelog for package autoware_lint_common
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.1 (2025-03-17)
 ------------------
 * fix(autoware_cmake): fix links to issues in CHANGELOG.rst files (`#13 <https://github.com/autowarefoundation/autoware_cmake/issues/13>`_)
