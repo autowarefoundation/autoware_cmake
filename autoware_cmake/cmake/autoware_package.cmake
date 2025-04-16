@@ -20,7 +20,7 @@ macro(autoware_package)
     set(CMAKE_CXX_EXTENSIONS OFF)
   endif()
   if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+    add_compile_options(-Wall -Wextra -Wpedantic -Werror -Wno-error=deprecated-declarations)
   endif()
 
   # Ignore PCL errors in Clang
