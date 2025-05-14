@@ -13,3 +13,4 @@
 # limitations under the License.
 
 include("${autoware_cmake_DIR}/autoware_package.cmake")
+include("${autoware_cmake_DIR}/autoware_cuda_package.cmake")
