@@ -24,12 +24,13 @@ macro(autoware_cuda_package)
 
   # Detect local GPU architecture
   execute_process(
-    COMMAND nvidia-smi --query-gpu=compute_cap --format=csv,noheader
+    COMMAND nvidia-smi --query-gpu=compute_cap --format=csv,noheader # cSpell:ignore noheader
     OUTPUT_VARIABLE LOCAL_GPU_ARCH
     ERROR_VARIABLE LOCAL_GPU_ARCH_ERR
     OUTPUT_STRIP_TRAILING_WHITESPACE
   )
 
+  # cSpell:ignore gencode
   if(LOCAL_GPU_ARCH)
     string(REPLACE "." "" LOCAL_GPU_ARCH "${LOCAL_GPU_ARCH}")
     message(STATUS "Found local GPU with compute capability: ${LOCAL_GPU_ARCH}")
