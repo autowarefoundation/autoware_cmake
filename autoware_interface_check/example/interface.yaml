@@ -1,0 +1,14 @@
+param-checks:
+  - schema:
+      package: autoware_interface_check
+      file: example/schema/foo.schema.json
+    params:
+      package: autoware_interface_check
+      file: example/config/foo_success.param.yaml
+
+  - schema:
+      package: autoware_interface_check
+      file: example/schema/foo.schema.json
+    params:
+      package: autoware_interface_check
+      file: example/config/foo_failure.param.yaml

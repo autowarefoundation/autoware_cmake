@@ -1,0 +1,4 @@
+/**:
+  ros__parameters:
+    angle: 0.0
+    frame: map

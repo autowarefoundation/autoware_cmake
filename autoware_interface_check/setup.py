@@ -1,3 +1,4 @@
+from glob import glob
 from warnings import simplefilter
 
 from pkg_resources import PkgResourcesDeprecationWarning
@@ -16,6 +17,8 @@ setup(
     data_files=[
         ("share/ament_index/resource_index/packages", [f"resource/{package_name}"]),
         (f"share/{package_name}", ["package.xml"]),
+        (f"share/{package_name}/example/config", glob("example/config/*")),
+        (f"share/{package_name}/example/schema", glob("example/schema/*")),
     ],
     install_requires=["setuptools"],
     zip_safe=True,

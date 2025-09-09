@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "The foo node parameters",
+  "type": "object",
+  "definitions": {
+    "foo_node": {
+      "type": "object",
+      "properties": {
+        "angle": {
+          "type": "number",
+          "default": 0.0,
+          "minimum": 0.0,
+          "maximum": 360.0
+        },
+        "frame": {
+          "type": "string"
+        }
+      },
+      "required": ["angle", "frame"]
+    }
+  },
+  "properties": {
+    "/**": {
+      "type": "object",
+      "properties": {
+        "ros__parameters": {
+          "$ref": "#/definitions/foo_node"
+        }
+      },
+      "required": ["ros__parameters"]
+    }
+  },
+  "required": ["/**"]
+}
