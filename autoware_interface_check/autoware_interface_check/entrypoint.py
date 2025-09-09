@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# cspell:ignore addindent, newl
+
 import argparse
 import textwrap
 import time
