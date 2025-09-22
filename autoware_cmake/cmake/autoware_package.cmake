@@ -20,7 +20,13 @@ macro(autoware_package)
     set(CMAKE_CXX_EXTENSIONS OFF)
   endif()
   if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+    add_compile_options(-Wall -Wextra -Wpedantic)
+    if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.24.0")
+      option(CMAKE_COMPILE_WARNING_AS_ERROR "Treat compiler warnings as errors." ON)
+      mark_as_advanced(CMAKE_COMPILE_WARNING_AS_ERROR)
+    else()
+      add_compile_options(-Werror)
+    endif()
   endif()
 
   # Ignore PCL errors in Clang
@@ -42,6 +48,8 @@ macro(autoware_package)
     add_compile_definitions(ROS_DISTRO_GALACTIC)
   elseif(${ROS_DISTRO} STREQUAL "humble")
     add_compile_definitions(ROS_DISTRO_HUMBLE)
+  elseif(${ROS_DISTRO} STREQUAL "jazzy")
+    add_compile_definitions(ROS_DISTRO_JAZZY)
   endif()
 
   # Find dependencies
