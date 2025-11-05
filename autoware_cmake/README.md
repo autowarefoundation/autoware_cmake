@@ -15,7 +15,7 @@ project(package_name)
 find_package(autoware_cmake REQUIRED)
 autoware_package()
 
- ament_auto_add_library(...)
+ament_auto_add_library(...)
 ```
 
 ### autoware_ament_auto_package.cmake
