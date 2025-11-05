@@ -13,6 +13,7 @@
 # limitations under the License.
 
 macro(autoware_ament_auto_package)
+  # cSpell:ignore ARGN
   cmake_parse_arguments(_ARG_AUTOWARE_AMENT_AUTO_PACKAGE
     "INSTALL_TO_PATH"
     ""
