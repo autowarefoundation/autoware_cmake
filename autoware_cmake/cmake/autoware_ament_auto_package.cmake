@@ -1,4 +1,4 @@
-# Copyright 2024 The Autoware Contributors
+# Copyright 2025 The Autoware Contributors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,48 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-#.rst:
-# autoware_ament_auto_package
-# ---------------------------
-#
-# Replacement for ament_auto_package() that maintains Autoware's include structure
-# across ROS 2 Humble, Jazzy, and Kilted.
-#
-# This macro replicates ament_auto_package() functionality but uses explicit
-# header installation to avoid the deprecation warning and ensure consistent
-# behavior across all ROS 2 distributions.
-#
-# Background:
-# - Autoware uses a naming convention where package names have 'autoware_' prefix
-#   (e.g., autoware_interpolation) but include paths do not (e.g., autoware/interpolation/)
-# - ROS 2 Kilted will change ament_auto_package() to install headers to
-#   include/${PROJECT_NAME}/, which would result in include/autoware_interpolation/autoware/interpolation/
-# - This macro ensures headers are always installed to include/ maintaining the
-#   current structure: include/autoware/interpolation/
-#
-# Usage:
-#   Replace ament_auto_package() with autoware_ament_auto_package() at the end of CMakeLists.txt
-#
-# Example:
-#   cmake_minimum_required(VERSION 3.14)
-#   project(autoware_interpolation)
-#
-#   find_package(autoware_cmake REQUIRED)
-#   autoware_package()
-#
-#   ament_auto_add_library(autoware_interpolation SHARED
-#     src/file1.cpp
-#     src/file2.cpp
-#   )
-#
-#   if(BUILD_TESTING)
-#     # ... tests ...
-#   endif()
-#
-#   autoware_ament_auto_package()  # Instead of ament_auto_package()
-#
-# @public
 
 macro(autoware_ament_auto_package)
   cmake_parse_arguments(_ARG_AUTOWARE_AMENT_AUTO_PACKAGE
