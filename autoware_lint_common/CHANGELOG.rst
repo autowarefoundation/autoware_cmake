@@ -2,6 +2,9 @@
 Changelog for package autoware_lint_common
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.2 (2025-04-08)
 ------------------
 
