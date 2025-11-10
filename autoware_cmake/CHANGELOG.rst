@@ -2,8 +2,8 @@
 Changelog for package autoware_cmake
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.0 (2025-11-10)
+------------------
 * feat: add autoware_ament_auto_package() macro (`#37 <https://github.com/autowarefoundation/autoware_cmake/issues/37>`_)
 * feat: jazzy-porting, add jazzy distro condition for jazzy related compiling (`#35 <https://github.com/autowarefoundation/autoware_cmake/issues/35>`_)
   cmake env::jazzy-porting::add jazzy distro condition for jazzy related compiling
