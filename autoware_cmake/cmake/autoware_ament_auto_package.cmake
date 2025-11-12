@@ -38,7 +38,7 @@ macro(autoware_ament_auto_package)
   # to maintain Autoware's naming convention across all ROS 2 versions
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include")
     ament_export_include_directories("include")
-    install(DIRECTORY include/ DESTINATION include
+    install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME}
       FILES_MATCHING
       PATTERN "*.h"
       PATTERN "*.hpp"
