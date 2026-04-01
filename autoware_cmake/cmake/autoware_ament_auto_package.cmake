@@ -40,20 +40,10 @@ macro(autoware_ament_auto_package)
     if(_ARG_AUTOWARE_AMENT_AUTO_PACKAGE_USE_SCOPED_HEADER_INSTALL_DIR)
       ament_export_include_directories("include/${PROJECT_NAME}")
       install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME}
-        FILES_MATCHING
-        PATTERN "*.h"
-        PATTERN "*.hpp"
-        PATTERN "*.hh"
-        PATTERN "*.hxx"
       )
     else()
       ament_export_include_directories("include")
       install(DIRECTORY include/ DESTINATION include
-        FILES_MATCHING
-        PATTERN "*.h"
-        PATTERN "*.hpp"
-        PATTERN "*.hh"
-        PATTERN "*.hxx"
       )
     endif()
   endif()
