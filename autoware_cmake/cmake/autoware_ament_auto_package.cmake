@@ -15,7 +15,7 @@
 macro(autoware_ament_auto_package)
   # cSpell:ignore ARGN
   cmake_parse_arguments(_ARG_AUTOWARE_AMENT_AUTO_PACKAGE
-    "INSTALL_TO_PATH"
+    "INSTALL_TO_PATH;USE_SCOPED_HEADER_INSTALL_DIR"
     ""
     "INSTALL_TO_SHARE"
     ${ARGN})
@@ -33,18 +33,19 @@ macro(autoware_ament_auto_package)
     endif()
   endforeach()
 
-  # Export and install include directory maintaining Autoware structure
-  # Always use "include" as destination (not "include/${PROJECT_NAME}")
-  # to maintain Autoware's naming convention across all ROS 2 versions
+  # Export and install include directory.
+  # When USE_SCOPED_HEADER_INSTALL_DIR is enabled, headers are installed under
+  # include/${PROJECT_NAME}. Otherwise, headers are installed under include.
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include")
-    ament_export_include_directories("include")
-    install(DIRECTORY include/ DESTINATION include
-      FILES_MATCHING
-      PATTERN "*.h"
-      PATTERN "*.hpp"
-      PATTERN "*.hh"
-      PATTERN "*.hxx"
-    )
+    if(_ARG_AUTOWARE_AMENT_AUTO_PACKAGE_USE_SCOPED_HEADER_INSTALL_DIR)
+      ament_export_include_directories("include/${PROJECT_NAME}")
+      install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME}
+      )
+    else()
+      ament_export_include_directories("include")
+      install(DIRECTORY include/ DESTINATION include
+      )
+    endif()
   endif()
 
   # Export and install all libraries
@@ -79,6 +80,5 @@ macro(autoware_ament_auto_package)
   endforeach()
 
   # Call ament_package with any unparsed arguments
-  set(_unparsed_args ${_ARG_AUTOWARE_AMENT_AUTO_PACKAGE_UNPARSED_ARGUMENTS})
-  ament_package(${_unparsed_args})
+  ament_package(${_ARG_AUTOWARE_AMENT_AUTO_PACKAGE_UNPARSED_ARGUMENTS})
 endmacro()
