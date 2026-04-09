@@ -2,6 +2,16 @@
 Changelog for package autoware_cmake
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.2.0 (2026-04-09)
+------------------
+* feat(autoware_cmake): support USE_SCOPED_HEADER_INSTALL_DIR in autoware_ament_auto_package (`#40 <https://github.com/autowarefoundation/autoware_cmake/issues/40>`_)
+  * feat(autoware_cmake): support USE_SCOPED_HEADER_INSTALL_DIR in autoware_ament_auto_package
+  * Removed the FILES_MATCHING patterns from both install calls
+  Removed unnecessary FILES_MATCHING patterns from install commands.
+  ---------
+  Co-authored-by: github-actions <github-actions@github.com>
+* Contributors: Vishal Chauhan
+
 1.1.0 (2025-11-10)
 ------------------
 * feat: add autoware_ament_auto_package() macro (`#37 <https://github.com/autowarefoundation/autoware_cmake/issues/37>`_)
