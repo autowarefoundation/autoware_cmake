@@ -39,6 +39,7 @@ macro(autoware_package)
 
   # PCL 1.14 propagates -fopenmp globally, causing Eigen
   # to spin-wait with OpenMP threads and starve other callbacks.
+  # cspell:ignore DEIGEN DONT
   add_compile_definitions(EIGEN_DONT_PARALLELIZE)
 
   # Ignore unnecessary CMake warnings
