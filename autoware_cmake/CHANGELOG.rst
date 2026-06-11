@@ -2,6 +2,14 @@
 Changelog for package autoware_cmake
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix: disable Eigen OpenMP parallelism to prevent callback starvation (`#42 <https://github.com/autowarefoundation/autoware_cmake/issues/42>`_)
+  * fix: disable Eigen OpenMP parallelism to prevent callback starvation
+  * add cspell ignore for EIGEN_DONT_PARALLELIZE
+  ---------
+* Contributors: iwatake
+
 1.2.0 (2026-04-09)
 ------------------
 * feat(autoware_cmake): support USE_SCOPED_HEADER_INSTALL_DIR in autoware_ament_auto_package (`#40 <https://github.com/autowarefoundation/autoware_cmake/issues/40>`_)
