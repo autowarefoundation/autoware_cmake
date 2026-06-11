@@ -37,6 +37,11 @@ macro(autoware_package)
   # Ignore Boost deprecated messages
   add_compile_definitions(BOOST_ALLOW_DEPRECATED_HEADERS)
 
+  # PCL 1.14 propagates -fopenmp globally, causing Eigen
+  # to spin-wait with OpenMP threads and starve other callbacks.
+  # cspell:ignore DEIGEN DONT
+  add_compile_definitions(EIGEN_DONT_PARALLELIZE)
+
   # Ignore unnecessary CMake warnings
   set(__dummy__ ${CMAKE_EXPORT_COMPILE_COMMANDS})
 
