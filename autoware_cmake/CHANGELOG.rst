@@ -2,8 +2,8 @@
 Changelog for package autoware_cmake
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.3.0 (2026-06-11)
+------------------
 * fix: disable Eigen OpenMP parallelism to prevent callback starvation (`#42 <https://github.com/autowarefoundation/autoware_cmake/issues/42>`_)
   * fix: disable Eigen OpenMP parallelism to prevent callback starvation
   * add cspell ignore for EIGEN_DONT_PARALLELIZE
