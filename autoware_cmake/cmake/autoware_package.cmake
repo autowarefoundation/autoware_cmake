@@ -27,6 +27,8 @@ macro(autoware_package)
     else()
       add_compile_options(-Werror)
     endif()
+    # Keep deprecations as warnings so deprecated APIs can be migrated incrementally
+    add_compile_options(-Wno-error=deprecated-declarations)
   endif()
 
   # Ignore PCL errors in Clang
