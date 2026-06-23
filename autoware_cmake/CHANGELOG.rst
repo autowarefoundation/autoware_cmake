@@ -2,6 +2,11 @@
 Changelog for package autoware_cmake
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.4.0 (2026-06-23)
+------------------
+* fix(autoware_cmake): remove workaround, fixed in https://github.com/ros2/tinyxml2_vendor/pull/23 (`#30 <https://github.com/autowarefoundation/autoware_cmake/issues/30>`_)
+* Contributors: Esteve Fernandez
+
 1.3.0 (2026-06-11)
 ------------------
 * fix: disable Eigen OpenMP parallelism to prevent callback starvation (`#42 <https://github.com/autowarefoundation/autoware_cmake/issues/42>`_)
