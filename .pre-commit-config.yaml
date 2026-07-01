@@ -25,7 +25,7 @@ repos:
         args: [--markdown-linebreak-ext=md]
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.48.0
+    rev: v0.49.0
     hooks:
       - id: markdownlint
         args: [-c, .markdownlint.yaml, --fix]
@@ -93,7 +93,7 @@ repos:
         exclude: .cu
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.37.2
+    rev: 0.37.4
     hooks:
       - id: check-metaschema
         files: ^.+/schema/.*schema\.json$
@@ -109,7 +109,7 @@ repos:
         additional_dependencies: [prettier@2.7.1, "@prettier/plugin-xml@2.2.0"]
 
   - repo: https://github.com/autowarefoundation/autoware_system_designer
-    rev: v0.3.2
+    rev: v0.4.1
     hooks:
       - id: lint-system-design-format
         args: [--format=github-actions]
