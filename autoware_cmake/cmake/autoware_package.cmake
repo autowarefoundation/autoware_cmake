@@ -75,6 +75,11 @@ macro(autoware_package)
     )
   endif()
 
+  if(MSVC)
+    add_compile_definitions(_USE_MATH_DEFINES)
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+  endif()
+
   # Find test dependencies
   if(BUILD_TESTING)
     find_package(ament_lint_auto REQUIRED)
