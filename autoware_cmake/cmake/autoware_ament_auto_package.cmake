@@ -48,9 +48,21 @@ macro(autoware_ament_auto_package)
 
   # Export and install all libraries
   if(NOT ${PROJECT_NAME}_LIBRARIES STREQUAL "")
+    # An INTERFACE library has no file, so the classic export skips it, as ament_auto_package()
+    # does on Jazzy and later. Otherwise a consumer stops with "exports the library ... which
+    # couldn't be found". The target export below handles INTERFACE libraries.
+    set(_libraries_with_files "")
+    foreach(_library ${${PROJECT_NAME}_LIBRARIES})
+      get_target_property(_library_type ${_library} TYPE)
+      if(NOT "${_library_type}" STREQUAL "INTERFACE_LIBRARY")
+        list(APPEND _libraries_with_files ${_library})
+      endif()
+    endforeach()
     # The classic export stays in both modes until every package uses EXPORT_LIBRARY_TARGETS
     # (phase 4 of autowarefoundation/autoware#7412).
-    ament_export_libraries(${${PROJECT_NAME}_LIBRARIES})
+    if(NOT "${_libraries_with_files}" STREQUAL "")
+      ament_export_libraries(${_libraries_with_files})
+    endif()
     if(_ARG_AUTOWARE_AMENT_AUTO_PACKAGE_EXPORT_LIBRARY_TARGETS)
       # A package can append more targets to ${PROJECT_NAME}_TARGETS before this call,
       # for example the target of generate_parameter_library().

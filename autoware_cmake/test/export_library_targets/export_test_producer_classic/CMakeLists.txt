@@ -21,4 +21,8 @@ include("${AUTOWARE_AMENT_AUTO_PACKAGE_FILE}")
 
 ament_auto_add_library(${PROJECT_NAME} SHARED src/producer_classic.cpp)
 
+# The same INTERFACE library case as in export_test_producer, without the flag
+add_library(${PROJECT_NAME}_definitions INTERFACE)
+list(APPEND ${PROJECT_NAME}_LIBRARIES ${PROJECT_NAME}_definitions)
+
 autoware_ament_auto_package()
