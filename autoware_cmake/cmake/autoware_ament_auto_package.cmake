@@ -88,6 +88,9 @@ macro(autoware_ament_auto_package)
       foreach(_target ${${PROJECT_NAME}_TARGETS})
         # The installed include folder comes first, so that consumers do not get an older copy
         # of these headers from a folder that a dependency exports, for example /opt/ros.
+        # The compiler searches every normal include folder before every system include folder,
+        # so this order does not help a consumer that sets CMAKE_NO_SYSTEM_FROM_IMPORTED, where
+        # the folders of the dependencies are normal include folders.
         # ament_auto_add_library() adds the include folder as a plain source path, which
         # install(EXPORT) rejects, so that path stays for the build only. Other source or build
         # paths stop install(EXPORT) on purpose.

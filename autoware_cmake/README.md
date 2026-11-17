@@ -60,6 +60,8 @@ Simply replace `ament_auto_package()` with `autoware_ament_auto_package()` at th
 - `INSTALL_TO_PATH`: Install executables to `bin/` instead of `lib/${PROJECT_NAME}/`
 - `INSTALL_TO_SHARE`: Install additional directories to `share/${PROJECT_NAME}/`
 
+The wrapper also takes `USE_SCOPED_HEADER_INSTALL_DIR`. With it, the headers go to `include/${PROJECT_NAME}/` instead of `include/`.
+
 #### Export the libraries as CMake targets
 
 Add `EXPORT_LIBRARY_TARGETS` to export each library of the package as a CMake target, `<package>::<library>`:
@@ -68,9 +70,9 @@ Add `EXPORT_LIBRARY_TARGETS` to export each library of the package as a CMake ta
 autoware_ament_auto_package(EXPORT_LIBRARY_TARGETS)
 ```
 
-A package that depends on it can link the targets with `target_link_libraries(<target> ${<package>_TARGETS})`. On all distributions, `ament_auto_add_library()` and `ament_auto_add_executable()` use the targets without a change. On Humble and Jazzy, `ament_target_dependencies()` uses them too. The headers of the package reach these packages as system headers, as before.
+A package that depends on it can link the targets with `target_link_libraries(<target> ${<package>_TARGETS})`. On all distributions, `ament_auto_add_library()` and `ament_auto_add_executable()` use the targets without a change. On Humble and Jazzy, `ament_target_dependencies()` uses them too. The headers of the package reach these packages as system headers. For `ament_auto_add_library()` and `ament_auto_add_executable()`, this is as before. A plain `ament_target_dependencies()` call gave them as normal headers before.
 
-The package also keeps exporting its own `<package>_LIBRARIES` and `<package>_INCLUDE_DIRS`. But the classic variables of a package that depends on it change. Its `<package>_LIBRARIES` holds the targets of the dependencies of this package, and its `<package>_INCLUDE_DIRS` and `<package>_RECURSIVE_DEPENDENCIES` no longer hold the entries of those dependencies.
+The package also keeps exporting its own `<package>_LIBRARIES` and `<package>_INCLUDE_DIRS`. But the classic variables one level downstream change. When package B depends on package A, and A uses the flag, `B_LIBRARIES` still holds the library file of A, and it holds the targets of the dependencies of A instead of their file lists. `B_INCLUDE_DIRS` and `B_RECURSIVE_DEPENDENCIES` no longer hold the entries of the dependencies of A.
 
 The flag takes its name from the open upstream proposal [ament/ament_cmake#455](https://github.com/ament/ament_cmake/pull/455). It differs from that proposal in these points:
 
