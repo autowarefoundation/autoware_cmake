@@ -15,7 +15,7 @@
 macro(autoware_ament_auto_package)
   # cSpell:ignore ARGN
   cmake_parse_arguments(_ARG_AUTOWARE_AMENT_AUTO_PACKAGE
-    "INSTALL_TO_PATH;USE_SCOPED_HEADER_INSTALL_DIR"
+    "INSTALL_TO_PATH;USE_SCOPED_HEADER_INSTALL_DIR;EXPORT_LIBRARY_TARGETS"
     ""
     "INSTALL_TO_SHARE"
     ${ARGN})
@@ -50,13 +50,57 @@ macro(autoware_ament_auto_package)
 
   # Export and install all libraries
   if(NOT ${PROJECT_NAME}_LIBRARIES STREQUAL "")
+    # The classic export stays in both modes, so code that reads <pkg>_LIBRARIES keeps working.
     ament_export_libraries(${${PROJECT_NAME}_LIBRARIES})
+    if(_ARG_AUTOWARE_AMENT_AUTO_PACKAGE_EXPORT_LIBRARY_TARGETS)
+      # A package can append more targets to ${PROJECT_NAME}_TARGETS before this call,
+      # for example the target of generate_parameter_library(), as in ament/ament_cmake#455.
+      list(APPEND ${PROJECT_NAME}_TARGETS ${${PROJECT_NAME}_LIBRARIES})
+    else()
+      install(
+        TARGETS ${${PROJECT_NAME}_LIBRARIES}
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin
+      )
+    endif()
+  endif()
+
+  # Export the libraries as CMake targets
+  if(_ARG_AUTOWARE_AMENT_AUTO_PACKAGE_EXPORT_LIBRARY_TARGETS AND
+      NOT "${${PROJECT_NAME}_TARGETS}" STREQUAL "")
+    list(REMOVE_DUPLICATES ${PROJECT_NAME}_TARGETS)
+    if(_ARG_AUTOWARE_AMENT_AUTO_PACKAGE_USE_SCOPED_HEADER_INSTALL_DIR)
+      set(_include_install_dir "include/${PROJECT_NAME}")
+    else()
+      set(_include_install_dir "include")
+    endif()
+    # ament_auto_add_library() adds the include folder as a plain source path. install(EXPORT)
+    # rejects a source path, so it becomes a build path and an install path.
+    foreach(_target ${${PROJECT_NAME}_TARGETS})
+      get_target_property(_include_dirs ${_target} INTERFACE_INCLUDE_DIRECTORIES)
+      if(_include_dirs)
+        set(_new_include_dirs "")
+        foreach(_dir IN LISTS _include_dirs)
+          if(_dir STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}/include")
+            list(APPEND _new_include_dirs
+              "$<BUILD_INTERFACE:${_dir}>"
+              "$<INSTALL_INTERFACE:${_include_install_dir}>")
+          else()
+            list(APPEND _new_include_dirs "${_dir}")
+          endif()
+        endforeach()
+        set_target_properties(${_target} PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${_new_include_dirs}")
+      endif()
+    endforeach()
     install(
-      TARGETS ${${PROJECT_NAME}_LIBRARIES}
+      TARGETS ${${PROJECT_NAME}_TARGETS}
+      EXPORT ${PROJECT_NAME}Targets
       ARCHIVE DESTINATION lib
       LIBRARY DESTINATION lib
       RUNTIME DESTINATION bin
     )
+    ament_export_targets(${PROJECT_NAME}Targets)
   endif()
 
   # Install executables

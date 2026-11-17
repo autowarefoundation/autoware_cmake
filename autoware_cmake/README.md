@@ -59,3 +59,21 @@ Simply replace `ament_auto_package()` with `autoware_ament_auto_package()` at th
 
 - `INSTALL_TO_PATH`: Install executables to `bin/` instead of `lib/${PROJECT_NAME}/`
 - `INSTALL_TO_SHARE`: Install additional directories to `share/${PROJECT_NAME}/`
+
+#### Export the libraries as CMake targets
+
+Add `EXPORT_LIBRARY_TARGETS` to export each library of the package as a CMake target, `<package>::<library>`:
+
+```cmake
+autoware_ament_auto_package(EXPORT_LIBRARY_TARGETS)
+```
+
+A package that depends on it links the targets with `target_link_libraries(<target> ${<package>_TARGETS})`. `ament_auto_add_library()`, `ament_auto_add_executable()` and `ament_target_dependencies()` use the targets without a change. The package also keeps exporting `<package>_LIBRARIES` and `<package>_INCLUDE_DIRS`, so code that reads them keeps working.
+
+The flag has the same name and behavior as in [ament/ament_cmake#455](https://github.com/ament/ament_cmake/pull/455), but it also keeps the classic export.
+
+With the flag, CMake checks each exported library when it installs the export. Fix these cases in the package:
+
+- An include folder inside the source or build folder stops the build. The macro fixes the `include` folder that `ament_auto_add_library()` adds. Wrap other folders in `$<BUILD_INTERFACE:...>`.
+- A local target that an exported library links stops the build, for example the target of `generate_parameter_library()`. Add it to the export before the macro call: `list(APPEND ${PROJECT_NAME}_TARGETS <target>)`.
+- An imported target of a dependency, for example `Eigen3::Eigen`, must be found in each package that uses the library, or that package stops with "the target was not found". The macro exports the dependencies of `package.xml` that are also run dependencies. If the CMake package name differs from the `package.xml` key, as for `eigen` and `Eigen3`, add `ament_export_dependencies(Eigen3)` before the macro call.
