@@ -70,9 +70,9 @@ Add `EXPORT_LIBRARY_TARGETS` to export each library of the package as a CMake ta
 autoware_ament_auto_package(EXPORT_LIBRARY_TARGETS)
 ```
 
-A package that depends on it can link the targets with `target_link_libraries(<target> ${<package>_TARGETS})`. On all distributions, `ament_auto_add_library()` and `ament_auto_add_executable()` use the targets without a change. On Humble and Jazzy, `ament_target_dependencies()` uses them too. The headers of the package reach these packages as system headers. For `ament_auto_add_library()` and `ament_auto_add_executable()`, this is as before. A plain `ament_target_dependencies()` call gave them as normal headers before.
+A package that depends on it can link the targets with `target_link_libraries(<target> ${<package>_TARGETS})`. On all distributions, `ament_auto_add_library()` and `ament_auto_add_executable()` use the targets without a change. On Humble and Jazzy, `ament_target_dependencies()` uses them too. The headers of the package reach these packages as system headers. For `ament_auto_add_library()` and `ament_auto_add_executable()`, this is as before. An `ament_target_dependencies()` call without `SYSTEM` gave them as normal headers before.
 
-The package also keeps exporting its own `<package>_LIBRARIES` and `<package>_INCLUDE_DIRS`. But the classic variables one level downstream change. When package B depends on package A, and A uses the flag, `B_LIBRARIES` still holds the library file of A, and it holds the targets of the dependencies of A instead of their file lists. `B_INCLUDE_DIRS` and `B_RECURSIVE_DEPENDENCIES` no longer hold the entries of the dependencies of A.
+The package also keeps exporting its own `<package>_LIBRARIES` and `<package>_INCLUDE_DIRS`. But the classic variables one level downstream change. When package B depends on package A, and A uses the flag, `B_LIBRARIES` still holds the library file of A, and it also holds the targets of the dependencies of A. `B_INCLUDE_DIRS` and `B_RECURSIVE_DEPENDENCIES` no longer hold the entries of the dependencies of A.
 
 The flag takes its name from the open upstream proposal [ament/ament_cmake#455](https://github.com/ament/ament_cmake/pull/455). It differs from that proposal in these points:
 
