@@ -18,6 +18,12 @@
 namespace export_test_producer_scoped
 {
 int thrice(int value);
+
+// The same check as in export_test_producer, for the scoped include folder
+inline int one(int unused_value)
+{
+  return 1;
+}
 }  // namespace export_test_producer_scoped
 
 #endif  // EXPORT_TEST_PRODUCER_SCOPED__PRODUCER_SCOPED_HPP_

@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <rcutils/allocator.h>
+#include "export_test_producer_scoped/producer_scoped.hpp"
 
 int export_test_build_depend_only()
 {
-  const rcutils_allocator_t allocator = rcutils_get_default_allocator();
-  return rcutils_allocator_is_valid(&allocator) ? 1 : 0;
+  return export_test_producer_scoped::thrice(1);
 }

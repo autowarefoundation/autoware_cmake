@@ -33,4 +33,16 @@ target_link_libraries(export_test_consumer_targets
   ${export_test_producer_scoped_TARGETS}
 )
 
+# Links the producers through the classic variables, which the flag keeps.
+# SYSTEM, because producer.hpp has an unused parameter on purpose.
+add_executable(export_test_consumer_classic src/classic.cpp)
+target_include_directories(export_test_consumer_classic SYSTEM PRIVATE
+  ${export_test_producer_INCLUDE_DIRS}
+  ${export_test_producer_classic_INCLUDE_DIRS}
+)
+target_link_libraries(export_test_consumer_classic
+  ${export_test_producer_LIBRARIES}
+  ${export_test_producer_classic_LIBRARIES}
+)
+
 autoware_ament_auto_package()

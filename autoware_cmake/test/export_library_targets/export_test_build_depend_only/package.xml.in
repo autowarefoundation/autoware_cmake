@@ -7,7 +7,7 @@
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
-  <build_depend>rcutils</build_depend>
+  <build_depend>export_test_producer_scoped</build_depend>
   <export>
     <build_type>ament_cmake</build_type>
   </export>

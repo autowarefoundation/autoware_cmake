@@ -14,13 +14,12 @@
 
 #include "export_test_producer/producer.hpp"
 
-#include <rcutils/allocator.h>
+#include "export_test_producer_scoped/producer_scoped.hpp"
 
 namespace export_test_producer
 {
 int twice(int value)
 {
-  const rcutils_allocator_t allocator = rcutils_get_default_allocator();
-  return rcutils_allocator_is_valid(&allocator) ? 2 * value : 0;
+  return export_test_producer_scoped::thrice(value) - value;
 }
 }  // namespace export_test_producer

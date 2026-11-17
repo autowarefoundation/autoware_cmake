@@ -13,8 +13,8 @@
 # limitations under the License.
 
 # Test of autoware_ament_auto_package(EXPORT_LIBRARY_TARGETS). It builds and installs two
-# producer packages with the flag, then builds a consumer that links them and runs it.
-# A third producer must stop at configure time.
+# producer packages with the flag and one without it, then builds a consumer that links them
+# and runs it. A fourth producer must stop at configure time.
 #
 # Usage: cmake -DSOURCE_DIR=<this folder> -DWORK_DIR=<empty folder>
 #   -DMACRO_FILE=<autoware_ament_auto_package.cmake> -P run_test.cmake
@@ -49,11 +49,17 @@ function(configure_package name)
 endfunction()
 
 file(REMOVE_RECURSE "${WORK_DIR}")
-foreach(name export_test_producer export_test_producer_scoped export_test_consumer export_test_build_depend_only)
+set(packages
+  export_test_producer_scoped
+  export_test_producer
+  export_test_producer_classic
+  export_test_consumer
+)
+foreach(name ${packages} export_test_build_depend_only)
   copy_package(${name})
 endforeach()
 
-foreach(name export_test_producer export_test_producer_scoped export_test_consumer)
+foreach(name ${packages})
   configure_package(${name})
   if(NOT configure_result EQUAL 0)
     message(FATAL_ERROR "configure ${name} failed with ${configure_result}:\n${configure_output}")
@@ -62,9 +68,12 @@ foreach(name export_test_producer export_test_producer_scoped export_test_consum
   run_step("install ${name}" ${CMAKE_COMMAND} --install "${WORK_DIR}/build/${name}")
 endforeach()
 
-# Both executables return 0 only when every library and the helper definition arrived.
-run_step("export_test_consumer_auto" "${WORK_DIR}/build/export_test_consumer/export_test_consumer_auto")
-run_step("export_test_consumer_targets" "${WORK_DIR}/build/export_test_consumer/export_test_consumer_targets")
+# Each executable returns 0 only when it got every library and definition that it uses.
+# LD_LIBRARY_PATH, as in a sourced workspace, finds the libraries that the producer libraries load.
+foreach(name export_test_consumer_auto export_test_consumer_targets export_test_consumer_classic)
+  run_step("${name}" ${CMAKE_COMMAND} -E env "LD_LIBRARY_PATH=${WORK_DIR}/install/lib"
+    "${WORK_DIR}/build/export_test_consumer/${name}")
+endforeach()
 
 configure_package(export_test_build_depend_only)
 if(configure_result EQUAL 0)
@@ -72,7 +81,7 @@ if(configure_result EQUAL 0)
 endif()
 # CMake wraps long messages over several lines.
 string(REGEX REPLACE "[ \t\r\n]+" " " configure_output_one_line "${configure_output}")
-if(NOT configure_output_one_line MATCHES "lists 'rcutils' only as a build dependency")
+if(NOT configure_output_one_line MATCHES "lists 'export_test_producer_scoped' only as a build dependency")
   message(FATAL_ERROR "configure export_test_build_depend_only failed for another reason:\n${configure_output}")
 endif()
 
