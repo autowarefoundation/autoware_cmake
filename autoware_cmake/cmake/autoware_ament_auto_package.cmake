@@ -36,25 +36,24 @@ macro(autoware_ament_auto_package)
   # Export and install include directory.
   # When USE_SCOPED_HEADER_INSTALL_DIR is enabled, headers are installed under
   # include/${PROJECT_NAME}. Otherwise, headers are installed under include.
+  if(_ARG_AUTOWARE_AMENT_AUTO_PACKAGE_USE_SCOPED_HEADER_INSTALL_DIR)
+    set(_include_install_dir "include/${PROJECT_NAME}")
+  else()
+    set(_include_install_dir "include")
+  endif()
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include")
-    if(_ARG_AUTOWARE_AMENT_AUTO_PACKAGE_USE_SCOPED_HEADER_INSTALL_DIR)
-      ament_export_include_directories("include/${PROJECT_NAME}")
-      install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME}
-      )
-    else()
-      ament_export_include_directories("include")
-      install(DIRECTORY include/ DESTINATION include
-      )
-    endif()
+    ament_export_include_directories("${_include_install_dir}")
+    install(DIRECTORY include/ DESTINATION ${_include_install_dir})
   endif()
 
   # Export and install all libraries
   if(NOT ${PROJECT_NAME}_LIBRARIES STREQUAL "")
-    # The classic export stays in both modes, so code that reads <pkg>_LIBRARIES keeps working.
+    # The classic export stays in both modes until every package uses EXPORT_LIBRARY_TARGETS
+    # (phase 4 of autowarefoundation/autoware#7412).
     ament_export_libraries(${${PROJECT_NAME}_LIBRARIES})
     if(_ARG_AUTOWARE_AMENT_AUTO_PACKAGE_EXPORT_LIBRARY_TARGETS)
       # A package can append more targets to ${PROJECT_NAME}_TARGETS before this call,
-      # for example the target of generate_parameter_library(), as in ament/ament_cmake#455.
+      # for example the target of generate_parameter_library().
       list(APPEND ${PROJECT_NAME}_TARGETS ${${PROJECT_NAME}_LIBRARIES})
     else()
       install(
@@ -67,40 +66,65 @@ macro(autoware_ament_auto_package)
   endif()
 
   # Export the libraries as CMake targets
-  if(_ARG_AUTOWARE_AMENT_AUTO_PACKAGE_EXPORT_LIBRARY_TARGETS AND
-      NOT "${${PROJECT_NAME}_TARGETS}" STREQUAL "")
-    list(REMOVE_DUPLICATES ${PROJECT_NAME}_TARGETS)
-    if(_ARG_AUTOWARE_AMENT_AUTO_PACKAGE_USE_SCOPED_HEADER_INSTALL_DIR)
-      set(_include_install_dir "include/${PROJECT_NAME}")
+  if(_ARG_AUTOWARE_AMENT_AUTO_PACKAGE_EXPORT_LIBRARY_TARGETS)
+    if("${${PROJECT_NAME}_TARGETS}" STREQUAL "")
+      message(WARNING "autoware_ament_auto_package(EXPORT_LIBRARY_TARGETS): "
+        "${PROJECT_NAME} has no library to export.")
     else()
-      set(_include_install_dir "include")
-    endif()
-    # ament_auto_add_library() adds the include folder as a plain source path. install(EXPORT)
-    # rejects a source path, so it becomes a build path and an install path.
-    foreach(_target ${${PROJECT_NAME}_TARGETS})
-      get_target_property(_include_dirs ${_target} INTERFACE_INCLUDE_DIRECTORIES)
-      if(_include_dirs)
-        set(_new_include_dirs "")
-        foreach(_dir IN LISTS _include_dirs)
-          if(_dir STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}/include")
-            list(APPEND _new_include_dirs
-              "$<BUILD_INTERFACE:${_dir}>"
-              "$<INSTALL_INTERFACE:${_include_install_dir}>")
-          else()
-            list(APPEND _new_include_dirs "${_dir}")
+      list(REMOVE_DUPLICATES ${PROJECT_NAME}_TARGETS)
+
+      # ament_auto_add_library() links the targets of every found build dependency, but only
+      # run dependencies are passed on. A consumer would stop with "the target was not found".
+      if(NOT ${PROJECT_NAME}_LIBRARIES STREQUAL "")
+        foreach(_dep ${${PROJECT_NAME}_FOUND_BUILD_DEPENDS})
+          if(NOT _dep IN_LIST _run_depends AND NOT "${${_dep}_TARGETS}" STREQUAL "")
+            message(FATAL_ERROR "autoware_ament_auto_package(EXPORT_LIBRARY_TARGETS): "
+              "the libraries of ${PROJECT_NAME} link the targets of '${_dep}', but package.xml "
+              "lists '${_dep}' only as a build dependency. Change it to <depend>.")
           endif()
         endforeach()
-        set_target_properties(${_target} PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${_new_include_dirs}")
       endif()
-    endforeach()
-    install(
-      TARGETS ${${PROJECT_NAME}_TARGETS}
-      EXPORT ${PROJECT_NAME}Targets
-      ARCHIVE DESTINATION lib
-      LIBRARY DESTINATION lib
-      RUNTIME DESTINATION bin
-    )
-    ament_export_targets(${PROJECT_NAME}Targets)
+
+      foreach(_target ${${PROJECT_NAME}_TARGETS})
+        # ament_auto_add_library() adds the include folder as a plain source path, which
+        # install(EXPORT) rejects. It stays for the build only, and INCLUDES DESTINATION below
+        # adds the installed folder. Other source or build paths stop install(EXPORT) on purpose.
+        get_target_property(_include_dirs ${_target} INTERFACE_INCLUDE_DIRECTORIES)
+        if(_include_dirs)
+          set(_new_include_dirs "")
+          foreach(_dir IN LISTS _include_dirs)
+            string(REGEX REPLACE "/+$" "" _dir_without_slash "${_dir}")
+            if(_dir_without_slash STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}/include")
+              list(APPEND _new_include_dirs "$<BUILD_INTERFACE:${_dir_without_slash}>")
+            else()
+              list(APPEND _new_include_dirs "${_dir}")
+            endif()
+          endforeach()
+          set_target_properties(${_target} PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${_new_include_dirs}")
+        endif()
+        # Consumers get the headers as system headers, as ament_target_dependencies(SYSTEM) gave
+        # them before. CMake does this for imported targets only by default, and
+        # mrt_cmake_modules turns that default off with CMAKE_NO_SYSTEM_FROM_IMPORTED.
+        if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include")
+          set_property(TARGET ${_target} APPEND PROPERTY INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
+            "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${_include_install_dir}>")
+        endif()
+      endforeach()
+
+      set(_includes_destination "")
+      if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include")
+        set(_includes_destination INCLUDES DESTINATION "${_include_install_dir}")
+      endif()
+      install(
+        TARGETS ${${PROJECT_NAME}_TARGETS}
+        EXPORT ${PROJECT_NAME}Targets
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin
+        ${_includes_destination}
+      )
+      ament_export_targets(${PROJECT_NAME}Targets HAS_LIBRARY_TARGET)
+    endif()
   endif()
 
   # Install executables

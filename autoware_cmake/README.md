@@ -68,12 +68,27 @@ Add `EXPORT_LIBRARY_TARGETS` to export each library of the package as a CMake ta
 autoware_ament_auto_package(EXPORT_LIBRARY_TARGETS)
 ```
 
-A package that depends on it links the targets with `target_link_libraries(<target> ${<package>_TARGETS})`. `ament_auto_add_library()`, `ament_auto_add_executable()` and `ament_target_dependencies()` use the targets without a change. The package also keeps exporting `<package>_LIBRARIES` and `<package>_INCLUDE_DIRS`, so code that reads them keeps working.
+A package that depends on it can link the targets with `target_link_libraries(<target> ${<package>_TARGETS})`. On all distributions, `ament_auto_add_library()` and `ament_auto_add_executable()` use the targets without a change. On Humble and Jazzy, `ament_target_dependencies()` uses them too. The headers of the package reach these packages as system headers, as before.
 
-The flag has the same name and behavior as in [ament/ament_cmake#455](https://github.com/ament/ament_cmake/pull/455), but it also keeps the classic export.
+The package also keeps exporting its own `<package>_LIBRARIES` and `<package>_INCLUDE_DIRS`. But the classic variables of a package that depends on it change: they hold the targets of this package instead of its file lists.
 
-With the flag, CMake checks each exported library when it installs the export. Fix these cases in the package:
+The flag takes its name from the open upstream proposal [ament/ament_cmake#455](https://github.com/ament/ament_cmake/pull/455). It differs from that proposal in these points:
 
-- An include folder inside the source or build folder stops the build. The macro fixes the `include` folder that `ament_auto_add_library()` adds. Wrap other folders in `$<BUILD_INTERFACE:...>`.
-- A local target that an exported library links stops the build, for example the target of `generate_parameter_library()`. Add it to the export before the macro call: `list(APPEND ${PROJECT_NAME}_TARGETS <target>)`.
-- An imported target of a dependency, for example `Eigen3::Eigen`, must be found in each package that uses the library, or that package stops with "the target was not found". The macro exports the dependencies of `package.xml` that are also run dependencies. If the CMake package name differs from the `package.xml` key, as for `eigen` and `Eigen3`, add `ament_export_dependencies(Eigen3)` before the macro call.
+- It keeps the classic export.
+- It exports the targets in `${PROJECT_NAME}_TARGETS` only with the flag.
+- The installed include folder follows `USE_SCOPED_HEADER_INSTALL_DIR`.
+- It marks the installed include folder as a system folder for the packages that use the library.
+- It stops when an exported library links a dependency that is only a build dependency.
+
+##### Problems that the flag shows
+
+With the flag, CMake checks each exported library when it configures the package, before anything compiles. Fix these cases in the package:
+
+- An include folder inside the source or build folder stops the configure step. The macro handles the `include` folder that `ament_auto_add_library()` adds. Wrap other folders in `$<BUILD_INTERFACE:...>`. If the package installs such a folder, also add `$<INSTALL_INTERFACE:...>` with the install path.
+- A local target that an exported library links stops the configure step, for example the target of `generate_parameter_library()`. Add it to the export before the macro call: `list(APPEND ${PROJECT_NAME}_TARGETS <target>)`.
+- A dependency of an exported library must reach each package that uses the library, or that package stops with "the target was not found". The macro passes on a dependency only when `package.xml` lists it as `<depend>`, `<build_export_depend>` or `<exec_depend>`. If the dependency is only a `<build_depend>`, the macro stops and asks you to change it to `<depend>`. If the CMake package name differs from the `package.xml` key, as for `eigen` and `Eigen3`, add `ament_export_dependencies(Eigen3)` before the macro call.
+
+Two more effects do not stop the build:
+
+- The `PUBLIC` compile options and definitions of an exported library now reach every package that links it. Make them `PRIVATE` when only the library needs them.
+- With `colcon build --symlink-install`, the exported libraries are copied to the install folder, not linked. After a rebuild outside colcon, run `colcon build` again to update the install folder.
