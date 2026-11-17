@@ -19,7 +19,7 @@
 # Usage: cmake -DSOURCE_DIR=<this folder> -DWORK_DIR=<empty folder>
 #   -DMACRO_FILE=<autoware_ament_auto_package.cmake> -P run_test.cmake
 
-# cSpell:ignore ARGN DAUTOWARE DCMAKE
+# cSpell:ignore ARGN DAUTOWARE DCMAKE DMACRO DSOURCE DWORK
 function(run_step name)
   execute_process(COMMAND ${ARGN}
     RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE output)

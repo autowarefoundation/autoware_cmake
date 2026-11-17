@@ -20,5 +20,7 @@ ament_auto_find_build_dependencies()
 include("${AUTOWARE_AMENT_AUTO_PACKAGE_FILE}")
 
 ament_auto_add_library(${PROJECT_NAME} SHARED src/producer.cpp)
+# The same folder as above, with a trailing slash, as some packages add it
+target_include_directories(${PROJECT_NAME} PUBLIC include/)
 
 autoware_ament_auto_package(EXPORT_LIBRARY_TARGETS)

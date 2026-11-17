@@ -75,7 +75,7 @@ macro(autoware_ament_auto_package)
 
       # ament_auto_add_library() links the targets of every found build dependency, but only
       # run dependencies are passed on. A consumer would stop with "the target was not found".
-      if(NOT ${PROJECT_NAME}_LIBRARIES STREQUAL "")
+      if(NOT "${${PROJECT_NAME}_LIBRARIES}" STREQUAL "")
         foreach(_dep ${${PROJECT_NAME}_FOUND_BUILD_DEPENDS})
           if(NOT _dep IN_LIST _run_depends AND NOT "${${_dep}_TARGETS}" STREQUAL "")
             message(FATAL_ERROR "autoware_ament_auto_package(EXPORT_LIBRARY_TARGETS): "
@@ -86,12 +86,17 @@ macro(autoware_ament_auto_package)
       endif()
 
       foreach(_target ${${PROJECT_NAME}_TARGETS})
+        # The installed include folder comes first, so that consumers do not get an older copy
+        # of these headers from a folder that a dependency exports, for example /opt/ros.
         # ament_auto_add_library() adds the include folder as a plain source path, which
-        # install(EXPORT) rejects. It stays for the build only, and INCLUDES DESTINATION below
-        # adds the installed folder. Other source or build paths stop install(EXPORT) on purpose.
+        # install(EXPORT) rejects, so that path stays for the build only. Other source or build
+        # paths stop install(EXPORT) on purpose.
+        set(_new_include_dirs "")
+        if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include")
+          list(APPEND _new_include_dirs "$<INSTALL_INTERFACE:${_include_install_dir}>")
+        endif()
         get_target_property(_include_dirs ${_target} INTERFACE_INCLUDE_DIRECTORIES)
         if(_include_dirs)
-          set(_new_include_dirs "")
           foreach(_dir IN LISTS _include_dirs)
             string(REGEX REPLACE "/+$" "" _dir_without_slash "${_dir}")
             if(_dir_without_slash STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -100,6 +105,8 @@ macro(autoware_ament_auto_package)
               list(APPEND _new_include_dirs "${_dir}")
             endif()
           endforeach()
+        endif()
+        if(NOT "${_new_include_dirs}" STREQUAL "")
           set_target_properties(${_target} PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${_new_include_dirs}")
         endif()
         # Consumers get the headers as system headers, as ament_target_dependencies(SYSTEM) gave
@@ -111,17 +118,12 @@ macro(autoware_ament_auto_package)
         endif()
       endforeach()
 
-      set(_includes_destination "")
-      if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include")
-        set(_includes_destination INCLUDES DESTINATION "${_include_install_dir}")
-      endif()
       install(
         TARGETS ${${PROJECT_NAME}_TARGETS}
         EXPORT ${PROJECT_NAME}Targets
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin
-        ${_includes_destination}
       )
       ament_export_targets(${PROJECT_NAME}Targets HAS_LIBRARY_TARGET)
     endif()

@@ -70,7 +70,7 @@ autoware_ament_auto_package(EXPORT_LIBRARY_TARGETS)
 
 A package that depends on it can link the targets with `target_link_libraries(<target> ${<package>_TARGETS})`. On all distributions, `ament_auto_add_library()` and `ament_auto_add_executable()` use the targets without a change. On Humble and Jazzy, `ament_target_dependencies()` uses them too. The headers of the package reach these packages as system headers, as before.
 
-The package also keeps exporting its own `<package>_LIBRARIES` and `<package>_INCLUDE_DIRS`. But the classic variables of a package that depends on it change: they hold the targets of this package instead of its file lists.
+The package also keeps exporting its own `<package>_LIBRARIES` and `<package>_INCLUDE_DIRS`. But the classic variables of a package that depends on it change. Its `<package>_LIBRARIES` holds the targets of the dependencies of this package, and its `<package>_INCLUDE_DIRS` and `<package>_RECURSIVE_DEPENDENCIES` no longer hold the entries of those dependencies.
 
 The flag takes its name from the open upstream proposal [ament/ament_cmake#455](https://github.com/ament/ament_cmake/pull/455). It differs from that proposal in these points:
 
