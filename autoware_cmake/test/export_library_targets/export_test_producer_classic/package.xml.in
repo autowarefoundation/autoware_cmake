@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>export_test_producer_classic</name>
+  <version>0.0.0</version>
+  <description>Producer without the flag</description>
+  <maintainer email="ryohsuke.mitsudome@tier4.jp">Ryohsuke Mitsudome</maintainer>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
