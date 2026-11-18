@@ -18,6 +18,6 @@
 int main()
 {
   const int result = export_test_producer::twice(2) + export_test_producer_scoped::thrice(1) +
-                     EXPORT_TEST_HELPER_VALUE;
-  return result == 10 ? 0 : 1;
+                     EXPORT_TEST_HELPER_VALUE + EXPORT_TEST_DEFINITIONS_VALUE;
+  return result == 15 ? 0 : 1;
 }
