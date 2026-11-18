@@ -48,9 +48,11 @@ macro(autoware_ament_auto_package)
 
   # Export and install all libraries
   if(NOT ${PROJECT_NAME}_LIBRARIES STREQUAL "")
-    # An INTERFACE library has no file, so the classic export skips it, as ament_auto_package()
-    # does on Jazzy and later. Otherwise a consumer stops with "exports the library ... which
-    # couldn't be found". The target export below handles INTERFACE libraries.
+    # An INTERFACE library has no file, so the classic export and the install without EXPORT skip
+    # it, as ament_auto_package() does on Jazzy and later. Otherwise a consumer stops with
+    # "exports the library ... which couldn't be found", and the install() of
+    # ament_cmake_symlink_install stops on it. With EXPORT_LIBRARY_TARGETS, the target export
+    # below handles INTERFACE libraries.
     set(_libraries_with_files "")
     foreach(_library ${${PROJECT_NAME}_LIBRARIES})
       get_target_property(_library_type ${_library} TYPE)
@@ -60,16 +62,14 @@ macro(autoware_ament_auto_package)
     endforeach()
     # The classic export stays in both modes until every package uses EXPORT_LIBRARY_TARGETS
     # (phase 4 of autowarefoundation/autoware#7412).
-    if(NOT "${_libraries_with_files}" STREQUAL "")
-      ament_export_libraries(${_libraries_with_files})
-    endif()
+    ament_export_libraries(${_libraries_with_files})
     if(_ARG_AUTOWARE_AMENT_AUTO_PACKAGE_EXPORT_LIBRARY_TARGETS)
       # A package can append more targets to ${PROJECT_NAME}_TARGETS before this call,
       # for example the target of generate_parameter_library().
       list(APPEND ${PROJECT_NAME}_TARGETS ${${PROJECT_NAME}_LIBRARIES})
     else()
       install(
-        TARGETS ${${PROJECT_NAME}_LIBRARIES}
+        TARGETS ${_libraries_with_files}
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin
